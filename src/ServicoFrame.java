@@ -83,9 +83,10 @@ public class ServicoFrame {
             dbManager.addServico(servico);
             JOptionPane.showMessageDialog(frame, "Serviço cadastrado: " + servico.getDescricao());
             clearFields();
+            refreshTable(); // Atualiza a tabela após o cadastro
         });
 
-        consultarButton.addActionListener(e -> refreshTable());
+        consultarButton.addActionListener(e -> refreshTable()); // Consulta sempre os dados mais recentes
 
         excluirButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
@@ -132,13 +133,17 @@ public class ServicoFrame {
             }
         });
 
+        // Chama refreshTable ao inicializar para mostrar os dados mais recentes
+        refreshTable();
         frame.setVisible(true);
     }
 
     private void refreshTable() {
-        ResultSet resultSet = dbManager.getAllServicos();
+        // Limpa a tabela antes de preencher novamente
         tableModel.setRowCount(0);
-        try {
+
+        // Tenta obter os dados do banco de dados
+        try (ResultSet resultSet = dbManager.getAllServicos()) {
             while (resultSet.next()) {
                 String descricao = resultSet.getString("descricao");
                 String atendente = resultSet.getString("atendente");
